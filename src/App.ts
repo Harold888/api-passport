@@ -9,6 +9,9 @@ import FormularioRouter from './routes/Formulario.routes'
 import cors from 'cors'
 import EspecialidadRouter from './routes/Especialidad.routes'
 import CitaRouter from './routes/Cita.routes'
+import rutas_auth from './routes/authRoutes'
+import passport from 'passport'
+import myStrategy from './config/passport'
 
 /**
  *  Clase principal de la API, Define las rutas de la API
@@ -37,11 +40,14 @@ class App {
 	 * Definbir y agregar las rutas de la API con express
 	 */
 	private routes(): void { 
-		this.app.use('/',PacienteRouter)
-		this.app.use('/',MedicoRouter)
-		this.app.use('/',FormularioRouter)
-		this.app.use('/',EspecialidadRouter)
-		this.app.use('/',CitaRouter)
+		this.app.use('/auth',rutas_auth)
+		passport.use(myStrategy)
+		this.app.use(passport.initialize())
+		this.app.use('/',passport.authenticate('jwt', {session:false}),PacienteRouter)
+		this.app.use('/',passport.authenticate('jwt', {session:false}),MedicoRouter)
+		this.app.use('/',passport.authenticate('jwt', {session:false}),FormularioRouter)
+		this.app.use('/',passport.authenticate('jwt', {session:false}),EspecialidadRouter)
+		this.app.use('/',passport.authenticate('jwt', {session:false}),passport.authenticate('jwt', {session:false}),CitaRouter)
 		
 	}
 
